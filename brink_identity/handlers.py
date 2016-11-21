@@ -1,4 +1,4 @@
-from brink_auth.models import User
+from brink_identity.models import User
 from brink.decorators import require_request_model
 from brink.exceptions import HTTPNotFound, HTTPBadRequest, HTTPUnauthorized
 import jwt

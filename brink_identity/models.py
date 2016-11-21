@@ -3,9 +3,11 @@ from brink import fields
 import hashlib
 
 
+
 class User(Model):
     username = fields.Field(required=True)
     password = fields.PasswordField()
+    roles = fields.ListField(fields.CharField(required=True, min_length=2))
 
     @staticmethod
     async def authenticate(username, password):
