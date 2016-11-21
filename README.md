@@ -3,14 +3,14 @@
 ## Installation
 
 ```
-$ pip3 install brink_auth
+$ pip3 install brink_identity
 ```
 
 and add it to your installed apps
 
 ```python
 INSTALLED_APPS = [
-    "brink_auth",
+    "brink_identity",
     ...
 ]
 ```

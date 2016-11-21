@@ -1,13 +1,11 @@
+from brink.models import Model
+from brink import fields
 import hashlib
-import brink.models as models
 
 
-class User(models.Model):
-
-    schema = {
-        "username": {"type": "string", "required": True},
-        "password": {"type": "string", "required": True, "minlength": 6}
-    }
+class User(Model):
+    username = fields.Field(required=True)
+    password = fields.PasswordField()
 
     @staticmethod
     async def authenticate(username, password):
@@ -21,7 +19,10 @@ class User(models.Model):
         else:
             return None
 
+    async def username_available(self):
+        return await User.filter({"username": self.username}).count().run() == 0
+
     def before_save(self):
-        self["password"] = hashlib.sha256(self["password"].encode("utf-8")) \
+        self.password = hashlib.sha256(self.password.encode("utf-8")) \
             .hexdigest()
 

@@ -8,11 +8,11 @@ with open(path.join(here, "README.md"), encoding="utf-8") as f:
     long_description = f.read()
 
 setup(
-    name="brink_auth",
+    name="brink_identity",
     version="0.1.0",
     description="User authentication for Brink.",
     long_description=long_description,
-    url="https://github.com/lohmander/brink_auth",
+    url="https://github.com/lohmander/brink_identity",
     author="CH Lohmander",
     author_email="hannes@lohmander.me",
     license="MIT",
