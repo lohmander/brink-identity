@@ -2,27 +2,24 @@ from brink.models import Model
 from brink import fields
 import hashlib
 
-
-
-class User(Model):
+class Identity(Model):
     username = fields.Field(required=True)
     password = fields.PasswordField()
-    roles = fields.ListField(fields.CharField(required=True, min_length=2))
+    roles = fields.ListField(fields.CharField(min_length=2))
 
-    @staticmethod
-    async def authenticate(username, password):
-        hash = hashlib.sha256(password.encode("utf-8")).hexdigest()
-        users = await User \
-            .filter({"username": username, "password": hash}) \
+    async def authenticate():
+        hash = hashlib.sha256(self.password.encode("utf-8")).hexdigest()
+        identities = await Identity \
+            .filter({"username": self.username, "password": hash}) \
             .as_list()
 
-        if len(users) == 1:
-            return users[0]
+        if len(identities) == 1:
+            return identities[0]
         else:
             return None
 
     async def username_available(self):
-        return await User.filter({"username": self.username}).count().run() == 0
+        return await Identity.filter({"username": self.username}).count().run() == 0
 
     def before_save(self):
         self.password = hashlib.sha256(self.password.encode("utf-8")) \
