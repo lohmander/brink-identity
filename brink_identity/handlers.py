@@ -1,6 +1,7 @@
 from brink.decorators import require_request_model
 from brink.exceptions import HTTPNotFound, HTTPBadRequest, HTTPUnauthorized
 from brink_identity.models import Identity
+from datetime import datetime, timedelta
 import jwt
 
 @require_request_model(Identity)
@@ -10,11 +11,19 @@ async def handle_auth_identity(request, identity):
     least a partial JSON representation of an Identity model object. The
     required fields are username and password.
     """
-    if not identity:
+    if not await identity.authenticate():
         raise HTTPUnauthorized(text="Incorrect username or password")
 
-    token = jwt.encode({"id": identity.id}, "secret", algorithm="HS256")
-    return 200, {"data": {"token": str(token)}}
+
+    exp = datetime.utcnow() + timedelta(days=1)
+    token = jwt.encode({"id": identity.id, "exp": exp}, "secret", algorithm="HS256")
+    res = {
+        "token": str(token),
+        "expires": exp,
+        "identity": identity
+    }
+
+    return 200, {"data": res}
 
 
 async def handle_list_identities(request):
@@ -69,6 +78,6 @@ async def handle_delete_identity(request):
     Handler for deleting an Identity with a given id.
     """
     id = request.match_info["id"]
-    Identity.delete(id)
+    await Identity.get(id).delete()
     return 204, None
 
