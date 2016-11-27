@@ -1,8 +1,11 @@
+from datetime import datetime, timedelta
+
+import jwt
 from brink.decorators import require_request_model
 from brink.exceptions import HTTPNotFound, HTTPBadRequest, HTTPUnauthorized
+
 from brink_identity.models import Identity
-from datetime import datetime, timedelta
-import jwt
+
 
 @require_request_model(Identity)
 async def handle_auth_identity(request, identity):
@@ -14,11 +17,11 @@ async def handle_auth_identity(request, identity):
     if not await identity.authenticate():
         raise HTTPUnauthorized(text="Incorrect username or password")
 
-
     exp = datetime.utcnow() + timedelta(days=1)
-    token = jwt.encode({"id": identity.id, "exp": exp}, "secret", algorithm="HS256")
+    token = jwt.encode({"id": identity.id, "exp": exp},
+                       "secret", algorithm="HS256")
     res = {
-        "token": str(token),
+        "token": token.decode("utf-8"),
         "expires": exp,
         "identity": identity
     }
@@ -31,7 +34,7 @@ async def handle_list_identities(request):
     Handler for listing identities.
     """
     users = await Identity.all().as_list()
-    return 200, { "data": users }
+    return 200, {"data": users}
 
 
 @require_request_model(Identity)
@@ -45,7 +48,7 @@ async def handle_create_identity(request, identity):
         raise HTTPBadRequest(text="username is already taken")
 
     await identity.save()
-    return 201, { "data": identity }
+    return 201, {"data": identity}
 
 
 async def handle_get_identity(request):
@@ -58,7 +61,7 @@ async def handle_get_identity(request):
     if not identity:
         raise HTTPNotFound()
 
-    return 200, { "data": identity }
+    return 200, {"data": identity}
 
 
 @require_request_model(Identity)
@@ -70,7 +73,7 @@ async def handle_update_identity(request, identity):
     id = request.match_info["id"]
     identity.id = id
     await identity.save()
-    return 200, { "data": identity }
+    return 200, {"data": identity}
 
 
 async def handle_delete_identity(request):
@@ -80,4 +83,3 @@ async def handle_delete_identity(request):
     id = request.match_info["id"]
     await Identity.get(id).delete()
     return 204, None
-

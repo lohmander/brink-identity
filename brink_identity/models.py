@@ -1,6 +1,8 @@
+import hashlib
+
 from brink.models import Model
 from brink import fields
-import hashlib
+
 
 class Identity(Model):
     username = fields.Field(required=True)
@@ -25,4 +27,3 @@ class Identity(Model):
     def before_save(self):
         self.password = hashlib.sha256(self.password.encode("utf-8")) \
             .hexdigest()
-
