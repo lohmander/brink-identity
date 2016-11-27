@@ -4,7 +4,7 @@ import hashlib
 
 class Identity(Model):
     username = fields.Field(required=True)
-    password = fields.PasswordField()
+    password = fields.PasswordField(required=True)
     roles = fields.ListField(fields.CharField(min_length=2))
 
     async def authenticate(self):
